@@ -47,6 +47,7 @@ done
 All IIAM $k
 All IEAM $k
 All IPI $k
-#All CheqV3
+All CheqV3
+#Test Git
 rm mess
 echo "Done!"
