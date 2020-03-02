@@ -95,7 +95,6 @@ uuid=$(uuidgen)
 psevdoc=$(grep -Eo 'DocId>.*' $NDpath);DocId=$(echo ${psevdoc:6:-11})
 
 psevtyp=$(grep -Eo 'DocType>.*' $NDpath);DocTyppe=$(echo ${psevtyp:8:-13})
-echo "AAAAAAAAAAAAAAAAAAA $psevtyp"
 psevfsrar=$(grep -Eo 'shipperID>.*' $NDpath);FSRAR_ID=$(echo ${psevfsrar:10:-15})
 
 n1=$(echo -n "{\"id\" : \"${uuid}.${DocId}@$Topic_in2\",\"content\":\"")
@@ -247,10 +246,10 @@ if (echo "$ans" | grep -A1 -q "doctype")
 All()
 {
 echo -e "\n============== Start chains | Catalog $1 ============="
-num=$(ls -v $BASEDIR/$1 | grep -E '^[[:digit:]]')
+num=$(ls -v $1 | grep -E '^[[:digit:]]')
 for j in $num
 do
-InChain="$BASEDIR/$1/$j"
+InChain="$1/$j"
 	Chain ${InChain} $1 $2
 	echo '-------------------'
 done

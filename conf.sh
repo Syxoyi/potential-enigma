@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURL=false
+CURL=true
 # ============= локальный bark
 HOST=localhost
 PORT=8070
@@ -100,6 +100,8 @@ case "$ucr" in
 ;;
 /IPI/19/2.xml) echo "$ans"
 ;;
+/chainsDoc_OldRR/5/8_RR.xml)StateCheck1 '<ErrText>0h6 Некорректный получатель:null документа</ErrText>'
+;;
 #---_CheqV3_---_CheqV3_---_CheqV3_---_CheqV3_---
 # /CheqV3/1/3.xml)echo -e "CheqOnline: $ucr"
 #;;
@@ -114,6 +116,7 @@ mess)echo -en "${NDpath:1} "; KafkaErr
 #---NewInKafk---NewInKafk---NewInKafk---NewInKafk---
 FRAILE)echo -e "${NDpath:1}  KafkaAnswer: $ans"
 ;;
+
 # --------------------------------------------------------
 # QueryRestBCode
 

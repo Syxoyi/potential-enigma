@@ -44,10 +44,11 @@ done
 
 #================================= chains =================================#
 
-All IIAM $k
-All IEAM $k
-All IPI $k
-All CheqV3
+#All IIAM $k
+#All IEAM $k
+#All IPI $k
+#All CheqV3
 #Test Git
+All chainsDoc_OldRR
 rm mess
 echo "Done!"
