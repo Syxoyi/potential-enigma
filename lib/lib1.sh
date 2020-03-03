@@ -69,7 +69,8 @@ create_json(){
 # ============= Формирование ЧекВ3 в json
 Che_V3(){
 	type_create_json="ChequeV3"
-	DATE="2020-01-01T23:59:59"
+	#DATE="2020-01-01T23:59:59"
+	DATE=$(xmllint --xpath "//*[local-name()='Date']/text()" $1 | cut -d'T' -f1)
 	create_json "$1" "$DATE" "$type_create_json"
 }
 
@@ -149,11 +150,11 @@ Chain()
 		then
 			if echo $file | grep -q '<ns:ChequeV3>'  ${file}
 			then
-#AAAA=$RANDOM
-				Che_V3 ${file} > mess  #| tee $BASEDIR/lib/log/$AAAA > mess
+AAAA=$RANDOM
+				Che_V3 ${file}  | tee $BASEDIR/lib/log/$AAAA > mess
 				NDpath=${file}
 				file="mess"
-#echo "$AAAA"
+echo "$AAAA"
 				KafkaMess $file
 			elif echo $file | grep -q '<Cheque address='  ${file}
 			then
@@ -216,17 +217,67 @@ StateCheck0(){
 
 KafkaErr() #?
 {
+findErr2=$(echo "$ans"|jq '.') #???
+#-----------------Проверка типа
 
-if (echo "$ans" | grep -A1 -q "doctype")
-	then 
-		echo -e "OK $ucr; Ответ:\n$ans\n"
-	elif [[ "$ans" != "" ]]
-		then 
-		echo "ERROR $ucr, Ответ не соответствует ожидаемому: $ans"
-	else
-		echo "ERROR $ucr, Ответ не получен из $Topic_out" # $ans"
-		exit 1
-	fi
+doctype_prov=$(echo "$ans" | jq -r '.doctype')
+if [[ "$doctype_prov" == 'chequeV3' ]]
+then
+	echo -n "ОК: Тип документа $doctype_prov"
+elif [[ "$doctype_prov" == 'cheque' ]]
+then
+	echo -n "ОК: Тип документа $doctype_prov"
+else
+	echo -e "ERROR: Некорректный тип документа: $doctype_prov \nAnswer: $findErr2"
+	exit 1
+
+fi
+
+#-----------------Проверка return 
+return_prov=$(echo "$ans"|jq -r '.return')
+if [[ "$return_prov" == '0' ]]
+then 
+	echo -n ". Чек продажи."
+elif [[ "$return_prov" == '1' ]]
+then 
+	echo -n ". Чук возврата."
+else 
+	echo ". Некорректный \"return\" $findErr2"
+	exit 1
+fi
+
+#----------------Проверка на наличие алккодов
+alccd_prov=$(echo "$ans"|jq -r '.content.position[].alccode')
+if [[ "$alccd_prov" == '' ]]
+then echo " Отсутвуют алккоды.";exit 1
+else echo -n " Ок: алккоды есть."
+fi
+
+FB_prov=$(echo "$ans"|jq -r '.content.position[].form')
+if [[ "$FB_prov" == '' ]]
+then echo " Отсутвуют справки Б."; exit 1
+else echo -n " Ок: Справки Б есть."
+fi
+
+barcodes_prov=$(echo "$ans"|jq -r '.content.position[].barcode')
+if [[ "$barcodes_prov" == '' ]]
+then echo " Отсутвуют марки."
+else echo " Ок: марки есть."
+fi
+
+echo "$ans"
+
+
+#if (echo "$ans" | grep -A1 -q "doctype")
+#	then 
+#		echo -e "OK $ucr; Ответ:\n$ans\n"
+#	elif [[ "$ans" != "" ]]
+#		then 
+#		echo "ERROR $ucr, Ответ не соответствует ожидаемому: $ans"
+#	else
+#		echo "ERROR $ucr, Ответ не получен из $Topic_out" # $ans"
+#		exit 1
+#	fi
 
 }
 

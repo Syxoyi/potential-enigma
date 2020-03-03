@@ -47,8 +47,8 @@ done
 #All IIAM $k
 #All IEAM $k
 #All IPI $k
-#All CheqV3
+All CheqV3
 #Test Git
-All chainsDoc_OldRR
+#All chainsDoc_OldRR $k
 rm mess
 echo "Done!"
