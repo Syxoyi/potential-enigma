@@ -1,0 +1,33 @@
+#!/usr/bin/python
+
+import socket
+
+sock=socket.socket()
+sock.connect(('localhost',9999))
+
+namefile=input("Cho za fail: ")
+filee=open(namefile,'rb')
+doc=filee.read()
+filee.close
+
+sock.send(doc)
+data=""
+print('Nu i')
+#while (doc):
+#    print('Nu i')
+#    data+=sock.recv(1024)
+#    print('Nu i blea')
+#data=sock.recv(10240)
+while sock:
+    print('gavo abotai')
+    data=sock.recv(1024)
+    print('Nu i bleaaaa:',data)
+    #reply = 'Server output: ' + data.decode("utf-8")
+    if not data:
+        break
+    #print(reply)
+#   conn.sendall(reply)
+print('Nu i blea')
+print("otlagalo")
+sock.close
+#print(data)

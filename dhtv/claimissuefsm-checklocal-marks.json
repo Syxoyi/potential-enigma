@@ -1,0 +1,83 @@
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "annotations": {
+      "description": "Обработчик локальной проверки: Проверка соответствия заказанных марок заявленному виду продукции"
+    },
+    "name": "svcapp-claimissuefsm-checklocal-marks",
+    "namespace": "default",
+    "labels": {
+      "app": "svcapp-claimissuefsm-checklocal-marks"
+    }
+  },
+  "spec": {
+    "selector": {
+      "matchLabels": {
+        "app": "svcapp-claimissuefsm-checklocal-marks"
+      }
+    },
+    "replicas": 0,
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "svcapp-claimissuefsm-checklocal-marks"
+        }
+      },
+      "spec": {
+        "hostname": "svcapphost-claimissuefsm-checklocal-marks",
+        "volumes": [
+          {
+            "name": "pvc",
+            "persistentVolumeClaim": {
+              "claimName": "ceph-share-claim"
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "svcapp",
+            "image": "r77ci/svcapp:1.0.8-SNAPSHOT",
+            "imagePullPolicy": "Always",
+            "command": [
+              "java",
+              "-Dfile.encoding=UTF8",
+              "-cp",
+              "svcapp-1.0.8-SNAPSHOT.jar:libs/*",
+              "com.centerinform.svcapp.SvcApplication"
+            ],
+            "args": [
+              "--spring.config.location=file:/mnt/ceph/settings/svcapp/",
+              "--spring.profiles.active=deploy",
+              "--logging.config=/mnt/ceph/settings/svcapp/log4j2-deploy.xml",
+              "--redis",
+              "--qname=$CLAIMISSUEFSM$CHECKLOCAL_MARKS"
+            ],
+            "volumeMounts": [
+              {
+                "name": "pvc",
+                "mountPath": "/mnt/ceph"
+              }
+            ],
+            "envFrom": [
+              {
+                "configMapRef": {
+                  "name": "svcapp-kubernetes-configmap"
+                }
+              }
+            ],
+            "resources": {
+              "requests": {
+                "cpu": "50m",
+                "memory": "250Mi"
+              },
+              "limits": {
+                "cpu": "250m"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
